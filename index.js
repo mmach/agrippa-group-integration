@@ -8,6 +8,7 @@ const CONN_URL = process.env.AMQP ? process.env.AMQP : 'amqp://oqxnmzzs:hUxy1BVE
 const PREFETCH = process.env.PREFETCH ? process.env.PREFETCH : 5;
 const MAX_CONNECTIONS = process.env.MAX_CONNECTIONS ? process.env.MAX_CONNECTIONS : 10;
 var queueSvc = azure.createQueueService();
+queueSvc.messageEncoder = new azure.QueueMessageEncoder.TextBase64QueueMessageEncoder();
 
 global.c = new Crawler({
     maxConnections: MAX_CONNECTIONS,
@@ -48,7 +49,7 @@ amqp.connect(CONN_URL, async function (error0, connection) {
 
 
                 await new Promise((res, rej) => {
-                    queueSvc.createMessage('crawler-group-queue', msg.content.toString(), function (error, results, response) {
+                    queueSvc.createMessage('crawler-group-queue', JSON.stringify(obj), function (error, results, response) {
                         if (!error) {
                             // Message inserted
                             res()
